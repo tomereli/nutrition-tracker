@@ -1,0 +1,157 @@
+openapi: 3.0.0
+info:
+  title: Nutrition Tracker API
+  version: 1.0.0
+paths:
+  /addEntry:
+    post:
+      summary: Add a nutrition entry
+      operationId: addEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [timestamp, description, calories, protein]
+              properties:
+                timestamp:
+                  type: string
+                  format: date-time
+                  description: Format YYYY-MM-DDThh:mm:ss
+                description:
+                  type: string
+                calories:
+                  type: integer
+                protein:
+                  type: integer
+                carbs:
+                  type: integer
+                fat:
+                  type: integer
+                caffeine:
+                  type: integer
+      responses:
+        '200':
+          description: Entry added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  entry:
+                    type: object
+        '400':
+          description: Bad request - missing required fields
+  /showDaily:
+    get:
+      summary: Show daily entries for a date range
+      operationId: showDaily
+      parameters:
+        - in: query
+          name: start
+          schema:
+            type: string
+            format: date
+          description: Start date in YYYY-MM-DD format (optional, defaults to beginning of current week)
+          required: false
+        - in: query
+          name: end
+          schema:
+            type: string
+            format: date
+          description: End date in YYYY-MM-DD format (optional, defaults to a week from start or today, whichever is earlier)
+          required: false
+      responses:
+        '200':
+          description: Daily entries for specified date range
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Bad request - invalid date format or range
+  /showSummary:
+    get:
+      summary: Show daily summaries for a date range
+      operationId: showSummary
+      parameters:
+        - in: query
+          name: start
+          schema:
+            type: string
+            format: date
+          description: Start date in YYYY-MM-DD format (optional, defaults to beginning of current week)
+          required: false
+        - in: query
+          name: end
+          schema:
+            type: string
+            format: date
+          description: End date in YYYY-MM-DD format (optional, defaults to a week from start or today, whichever is earlier)
+          required: false
+      responses:
+        '200':
+          description: Daily summaries for specified date range
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Bad request - invalid date format or range
+  /getWeeklyReport:
+    get:
+      summary: Fetch HTML report for a date range
+      operationId: getWeeklyReport
+      parameters:
+        - in: query
+          name: start
+          schema:
+            type: string
+            format: date
+          description: Start date in YYYY-MM-DD format
+          required: true
+        - in: query
+          name: end
+          schema:
+            type: string
+            format: date
+          description: End date in YYYY-MM-DD format
+          required: true
+      responses:
+        '200':
+          description: HTML Report for specified date range
+          content:
+            text/html: {}
+        '400':
+          description: Bad request - invalid date format or range
+  /deleteEntry:
+    post:
+      summary: Delete entries for a specific date
+      operationId: deleteEntry
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [date]
+              properties:
+                date:
+                  type: string
+                  format: date
+                  description: Date in YYYY-MM-DD format
+      responses:
+        '200':
+          description: Entries deleted successfully
+        '404':
+          description: No entries found for specified date
+  /flushEntries:
+    post:
+      summary: Delete all entries
+      operationId: flushEntries
+      responses:
+        '200':
+          description: All entries flushed successfully
